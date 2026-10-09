@@ -1,2 +1,1 @@
--- bootstrap lazy.nvim, LazyVim and your plugins
-require("config.lazy")
+-- Neovim config, rebuilt from scratch on stock Neovim (0.12+).
