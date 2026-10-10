@@ -13,6 +13,11 @@
       "rev": "642c55ad2225f9f4809905918121b2c6d252ad58",
       "src": "https://github.com/scottmckendry/cyberdream.nvim"
     },
+    "herdr-nvim": {
+      "rev": "24f513d8bc9169746839c184975b12a0bcfbd4a3",
+      "src": "https://github.com/ChmaraX/herdr-nvim",
+      "version": "1.0.0 - 2.0.0"
+    },
     "nvim-lint": {
       "rev": "f6230a5c06ba59e6059c14637f1dbe29a7978b9b",
       "src": "https://github.com/mfussenegger/nvim-lint"
