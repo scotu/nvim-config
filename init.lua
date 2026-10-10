@@ -27,6 +27,9 @@ vim.pack.add({
   "https://github.com/mfussenegger/nvim-lint",
   -- v1 tags ship a prebuilt fuzzy matcher; main (v2) needs a Rust toolchain to build it.
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range("1") },
+  -- Nvim half of herdr-nvim; the herdr half is installed by the dotfiles repo
+  -- (run_onchange_after_install-herdr.sh.tmpl). Keep both on the same major version.
+  { src = "https://github.com/ChmaraX/herdr-nvim", version = vim.version.range("1") },
 })
 
 -- Colorscheme. Light/dark follows the OS through the terminal: Nvim queries the
@@ -50,6 +53,10 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Completion
 require("blink.cmp").setup({})
+
+-- herdr-nvim: annotate code and send it to an agent in the same herdr workspace.
+-- Keymaps under <leader>a: c comment, l list, s paste to agent, S submit, i reference.
+require("herdr-nvim").setup({})
 
 -- Language servers. nvim-lspconfig supplies the server configs; these are the
 -- local tweaks. Default keymaps come from Nvim itself: K (hover), grn (rename),
