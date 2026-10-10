@@ -1,7 +1,8 @@
 -- Neovim config, rebuilt from scratch on stock Neovim (0.12+).
 --
--- Language tools (basedpyright, ruff, tsc, prettier, tree-sitter-cli) come from
--- Homebrew via the chezmoi Brewfile, not from inside Neovim.
+-- Language tools (basedpyright, ruff, tsc, prettier, swiftformat,
+-- xcode-build-server, tree-sitter-cli) come from Homebrew via the chezmoi
+-- Brewfile, not from inside Neovim. sourcekit-lsp comes with Xcode.
 
 -- Plugin hooks. Defined before vim.pack.add so they also fire on first install.
 vim.api.nvim_create_autocmd("PackChanged", {
@@ -37,9 +38,9 @@ vim.cmd.colorscheme("cyberdream")
 
 -- Treesitter: parsers for syntax highlighting. install() is a no-op for
 -- parsers already present, and builds missing ones in the background.
-require("nvim-treesitter").install({ "python", "javascript", "typescript", "tsx" })
+require("nvim-treesitter").install({ "python", "javascript", "typescript", "tsx", "swift" })
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "python", "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  pattern = { "python", "javascript", "javascriptreact", "typescript", "typescriptreact", "swift" },
   callback = function()
     -- pcall: the parser may still be building on a fresh install.
     pcall(vim.treesitter.start)
@@ -77,8 +78,13 @@ vim.lsp.config("basedpyright", {
   end,
 })
 
+-- sourcekit-lsp comes with Xcode. lspconfig also attaches it to C/C++; keep it to
+-- Swift and Objective-C. Xcode projects need a buildServer.json in the project root:
+--   xcode-build-server config -project App.xcodeproj -scheme App   (then build once in Xcode)
+vim.lsp.config("sourcekit", { filetypes = { "swift", "objc", "objcpp" } })
+
 -- tsc is TypeScript 7's built-in server; lspconfig prefers node_modules/.bin/tsc when it's 7+.
-vim.lsp.enable({ "basedpyright", "ruff", "tsc" })
+vim.lsp.enable({ "basedpyright", "ruff", "tsc", "sourcekit" })
 
 vim.diagnostic.config({ virtual_text = true })
 
@@ -90,6 +96,8 @@ require("conform").setup({
     javascriptreact = { "prettier" },
     typescript = { "prettier" },
     typescriptreact = { "prettier" },
+    -- SwiftFormat (nicklockwood): Xcode-style defaults, reads a project's .swiftformat.
+    swift = { "swiftformat" },
   },
   default_format_opts = { lsp_format = "fallback" },
   format_on_save = { timeout_ms = 1000 },
