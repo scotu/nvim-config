@@ -13,6 +13,10 @@
       "rev": "642c55ad2225f9f4809905918121b2c6d252ad58",
       "src": "https://github.com/scottmckendry/cyberdream.nvim"
     },
+    "nvim-lint": {
+      "rev": "f6230a5c06ba59e6059c14637f1dbe29a7978b9b",
+      "src": "https://github.com/mfussenegger/nvim-lint"
+    },
     "nvim-lspconfig": {
       "rev": "c59fc922f718fa055f69f5f3bc888f23211571eb",
       "src": "https://github.com/neovim/nvim-lspconfig"

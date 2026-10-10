@@ -1,6 +1,6 @@
 -- Neovim config, rebuilt from scratch on stock Neovim (0.12+).
 --
--- Language tools (basedpyright, ruff, tsc, prettier, swiftformat,
+-- Language tools (basedpyright, ruff, tsc, prettier, swiftformat, swiftlint,
 -- xcode-build-server, tree-sitter-cli) come from Homebrew via the chezmoi
 -- Brewfile, not from inside Neovim. sourcekit-lsp comes with Xcode.
 
@@ -24,6 +24,7 @@ vim.pack.add({
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/nvim-treesitter/nvim-treesitter",
   "https://github.com/stevearc/conform.nvim",
+  "https://github.com/mfussenegger/nvim-lint",
   -- v1 tags ship a prebuilt fuzzy matcher; main (v2) needs a Rust toolchain to build it.
   { src = "https://github.com/saghen/blink.cmp", version = vim.version.range("1") },
 })
@@ -101,4 +102,38 @@ require("conform").setup({
   },
   default_format_opts = { lsp_format = "fallback" },
   format_on_save = { timeout_ms = 1000 },
+})
+
+-- Linting for tools that aren't language servers (ruff, tsc, sourcekit-lsp
+-- report their own diagnostics). nvim-lint runs them and shows their output.
+local lint = require("lint")
+lint.linters_by_ft = { swift = { "swiftlint" } }
+
+-- nvim-lint's swiftlint finds .swiftlint.yml once and reuses it for every
+-- project in the session; look it up per buffer instead. With a config it
+-- lints the saved file (so the config's excludes apply), else it lints stdin.
+-- Run from the file's directory: on stdin swiftlint reads config from its cwd,
+-- which would otherwise be Nvim's cwd, possibly another project.
+local swiftlint = lint.linters.swiftlint
+lint.linters.swiftlint = function()
+  local linter = swiftlint()
+  local dir = vim.fs.dirname(vim.api.nvim_buf_get_name(0))
+  linter.cwd = dir
+  local config = vim.fs.find(".swiftlint.yml", { upward = true, path = dir })[1]
+  if config then
+    linter.args = { "lint", "--force-exclude", "--use-alternative-excluding", "--config", config }
+    linter.stdin = false
+  else
+    linter.args = { "lint", "--use-stdin" }
+    linter.stdin = true
+  end
+  return linter
+end
+
+-- Lint on open and on save (not while typing: with a config, swiftlint reads
+-- the file on disk). "Open" is FileType: on BufReadPost the filetype isn't set yet.
+vim.api.nvim_create_autocmd({ "FileType", "BufWritePost" }, {
+  callback = function()
+    lint.try_lint()
+  end,
 })
