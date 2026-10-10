@@ -30,6 +30,7 @@ vim.pack.add({
   -- Nvim half of herdr-nvim; the herdr half is installed by the dotfiles repo
   -- (run_onchange_after_install-herdr.sh.tmpl). Keep both on the same major version.
   { src = "https://github.com/ChmaraX/herdr-nvim", version = vim.version.range("1") },
+  "https://github.com/MeanderingProgrammer/render-markdown.nvim",
 })
 
 -- Colorscheme. Light/dark follows the OS through the terminal: Nvim queries the
@@ -53,6 +54,10 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Completion
 require("blink.cmp").setup({})
+
+-- Render Markdown in the buffer (headings, code blocks, tables, checkboxes). Needs the
+-- markdown and markdown_inline parsers, which Nvim bundles.
+require("render-markdown").setup({})
 
 -- herdr-nvim: annotate code and send it to an agent in the same herdr workspace.
 -- Keymaps under <leader>a: c comment, l list, s paste to agent, S submit, i reference.
